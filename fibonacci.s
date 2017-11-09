@@ -25,11 +25,7 @@ main:
 	mov	rsi, qword[tmp]
 
 	mov	ecx, 1			; Fibonacci loop
-	xor	ebx, ebx
 Loop:
-	cmp	ebx, 0
-	jne	Switch
-	mov	ebx, 1
 	mov	rax, qword [two]
 	add	qword [one], rax
 	mov	rax, qword [two+8]
@@ -42,35 +38,19 @@ Loop:
 	adc	qword [one+32], rax
 	mov	rax, qword [two+40]
 	adc	qword [one+40], rax
-	jmp	Move
 
-Switch:
-	xor	ebx, ebx
-	mov	rax, qword [one]
-	add	qword [two], rax
-	mov	rax, qword [one+8]
-	adc	qword [two+8], rax
-	mov	rax, qword [one+16]
-	adc	qword [two+16], rax
-	mov	rax, qword [one+24]
-	adc	qword [two+24], rax
-	mov	rax, qword [one+32]
-	adc	qword [two+32], rax
-	mov	rax, qword [one+40]
-	adc	qword [two+40], rax
-
-Move:
 	mov	dword[tmp2], ecx
 	mov	dword[tmp3], ebx
 	mov	qword[tmp], rsi		; Print the fib number
 	call	Copy_next
-	call	display_fib
+	;call	display_fib
 	mov	ecx, dword[tmp2]
 	mov	ebx, dword[tmp3]
 	mov	rsi, qword[tmp]
 	inc	ecx
 	cmp	ecx, [num]
 	jne	Loop
+	call	display_fib
 
 	xor	rax, rax		; Return value 0
 
@@ -100,7 +80,7 @@ fib_usage:
 
 Copy_next:
 	push	rax			; Save rax
-	mov	rax, [one+40]
+	mov	rax, [one+40]		; fib_num = one
 	mov	[fib_num+40], rax
 	mov	rax, [one+32]
 	mov	[fib_num+32], rax
@@ -112,6 +92,33 @@ Copy_next:
 	mov	[fib_num+8], rax
 	mov	rax, [one]
 	mov	[fib_num], rax
+
+	mov	rax, [two+40]		; one = two
+	mov	[one+40], rax
+	mov	rax, [two+32]
+	mov	[one+32], rax
+	mov	rax, [two+24]
+	mov	[one+24], rax
+	mov	rax, [two+16]
+	mov	[one+16], rax
+	mov	rax, [two+8]
+	mov	[one+8], rax
+	mov	rax, [two]
+	mov	[one], rax
+
+	mov	rax, [fib_num+40]	; two = fib_num
+	mov	[two+40], rax
+	mov	rax, [fib_num+32]
+	mov	[two+32], rax
+	mov	rax, [fib_num+24]
+	mov	[two+24], rax
+	mov	rax, [fib_num+16]
+	mov	[two+16], rax
+	mov	rax, [fib_num+8]
+	mov	[two+8], rax
+	mov	rax, [fib_num]
+	mov	[two], rax
+
 	pop	rax			; restore rax
 	ret
 
@@ -126,7 +133,7 @@ Fib_format:
 	db "fib_num+40=%016llx fib_num+32=%016llx fib_num+24=%016llx fib_num+16=%016llx fib_num+8=%016llx fib_num=%016llx", 10, 0
 
 Ans_format:
-	db "%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
+	db "0x%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
 
 fib_num:
 	dq 0
