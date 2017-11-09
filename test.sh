@@ -19,7 +19,7 @@ else
         echo " - FAIL: FIB DOES NOT ERROR W/ NO ARGS"
 fi
 
-./fibonacci 0
+./fibonacci 2
 if [ $? -eq 0 ]; then
         echo " + Fib returns 0 w/ no command args"
 else
