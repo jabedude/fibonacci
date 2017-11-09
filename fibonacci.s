@@ -1,5 +1,6 @@
 	extern	printf
 	extern	puts
+	extern	putchar
 	extern	strtoul
 	global	main			; global entry point
 
@@ -23,10 +24,32 @@ main:
 	call	printf
 	mov	rsi, qword[tmp]
 
+	call	display_fib		; DEBUG
+	
+	mov	rbx, 1			; Fibonacci loop
+Loop:
+	mov	rax, qword [one]
+	add	qword [two], rax
+	adc	qword [two+8], 
+
+	inc	rbx
+	cmp	rbx, [num]
+	jne	Loop
+
 	xor	rax, rax		; Return value 0
 
 Exit:
 	pop	r15
+	ret
+
+display_fib:
+	mov	rdi, Fib_format
+	mov	rsi, [fib_num+24]
+	mov	rdx, [fib_num+16]
+	mov	rcx, [fib_num+8]
+	mov	r8,  [fib_num]
+	xor	rax, rax
+	call	printf
 	ret
 
 
@@ -45,7 +68,27 @@ Echo:
 
 Usage:
 	db "./fibonacci <number>", 10, 0
+
+Fib_format:
+	db "fib_number+24=%016llx fib_number+16=%016llx fib_number+8=%016llx fib_number=%016llx", 10, 0
+
+fib_num:
+	dq 0xdeadbeefffffffff
+	dq 0
+	dq 0
+	dq 0
+
+one:
+	dq 0
+	dq 0
+	dq 0
+	dq 0
 	
+two:
+	dq 1
+	dq 0
+	dq 0
+	dq 0
 
 	section .bss
 tmp:		resq	1
