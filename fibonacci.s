@@ -26,14 +26,49 @@ main:
 
 	call	display_fib		; DEBUG
 	
-	mov	rbx, 1			; Fibonacci loop
+	mov	ecx, 1			; Fibonacci loop
+	xor	ebx, ebx
 Loop:
+	cmp	ebx, 0
+	jne	Switch
+	mov	ebx, 1
+	mov	rax, qword [two]
+	add	qword [one], rax
+	mov	rax, qword [two+8]
+	adc	qword [one+8], rax
+	mov	rax, qword [two+16]
+	adc	qword [one+16], rax
+	mov	rax, qword [two+24]
+	adc	qword [one+24], rax
+	mov	rax, qword [two+32]
+	adc	qword [one+32], rax
+	mov	rax, qword [two+40]
+	adc	qword [one+40], rax
+	jmp	Move
+
+Switch:
+	xor	ebx, ebx
 	mov	rax, qword [one]
 	add	qword [two], rax
-	adc	qword [two+8], 
+	mov	rax, qword [one+8]
+	adc	qword [two+8], rax
+	mov	rax, qword [one+16]
+	adc	qword [two+16], rax
+	mov	rax, qword [one+24]
+	adc	qword [two+24], rax
+	mov	rax, qword [one+32]
+	adc	qword [two+32], rax
+	mov	rax, qword [one+40]
+	adc	qword [two+40], rax
 
-	inc	rbx
-	cmp	rbx, [num]
+Move:
+	mov	dword[tmp2], ecx
+	mov	qword[tmp], rsi		; Print the fib number
+	call	display_fib
+	mov	ecx, dword[tmp2]
+	mov	rsi, qword[tmp]
+	inc	ecx
+	cmp	ecx, [num]
 	jne	Loop
 
 	xor	rax, rax		; Return value 0
@@ -43,13 +78,16 @@ Exit:
 	ret
 
 display_fib:
-	mov	rdi, Fib_format
-	mov	rsi, [fib_num+24]
-	mov	rdx, [fib_num+16]
-	mov	rcx, [fib_num+8]
-	mov	r8,  [fib_num]
+	mov	rdi, Ans_format
+	mov	rsi, [two+40]
+	mov	rdx, [two+32]
+	mov	rcx, [two+24]
+	mov	r8,  [two+16]
+	mov	r9,  [two+8]
+	push	qword [two]
 	xor	rax, rax
 	call	printf
+	pop	qword [two]
 	ret
 
 
@@ -70,15 +108,22 @@ Usage:
 	db "./fibonacci <number>", 10, 0
 
 Fib_format:
-	db "fib_number+24=%016llx fib_number+16=%016llx fib_number+8=%016llx fib_number=%016llx", 10, 0
+	db "fib_num+40=%016llx fib_num+32=%016llx fib_num+24=%016llx fib_num+16=%016llx fib_num+8=%016llx fib_num=%016llx", 10, 0
+
+Ans_format:
+	db "%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
 
 fib_num:
 	dq 0xdeadbeefffffffff
 	dq 0
 	dq 0
 	dq 0
+	dq 0
+	dq 0
 
 one:
+	dq 0
+	dq 0
 	dq 0
 	dq 0
 	dq 0
@@ -89,7 +134,11 @@ two:
 	dq 0
 	dq 0
 	dq 0
+	dq 0
+	dq 0
 
 	section .bss
 tmp:		resq	1
+tmp2:		resd	1
+tmp3:		resq	1
 num:		resq	1
