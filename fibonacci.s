@@ -24,8 +24,6 @@ main:
 	call	printf
 	mov	rsi, qword[tmp]
 
-	call	display_fib		; DEBUG
-	
 	mov	ecx, 1			; Fibonacci loop
 	xor	ebx, ebx
 Loop:
@@ -63,9 +61,12 @@ Switch:
 
 Move:
 	mov	dword[tmp2], ecx
+	mov	dword[tmp3], ebx
 	mov	qword[tmp], rsi		; Print the fib number
+	call	Copy_next
 	call	display_fib
 	mov	ecx, dword[tmp2]
+	mov	ebx, dword[tmp3]
 	mov	rsi, qword[tmp]
 	inc	ecx
 	cmp	ecx, [num]
@@ -79,17 +80,16 @@ Exit:
 
 display_fib:
 	mov	rdi, Ans_format
-	mov	rsi, [two+40]
-	mov	rdx, [two+32]
-	mov	rcx, [two+24]
-	mov	r8,  [two+16]
-	mov	r9,  [two+8]
-	push	qword [two]
+	mov	rsi, [fib_num+40]
+	mov	rdx, [fib_num+32]
+	mov	rcx, [fib_num+24]
+	mov	r8,  [fib_num+16]
+	mov	r9,  [fib_num+8]
+	push	qword [fib_num]
 	xor	rax, rax
 	call	printf
-	pop	qword [two]
+	pop	qword [fib_num]
 	ret
-
 
 fib_usage:
 	mov	rdi, Usage
@@ -98,7 +98,22 @@ fib_usage:
 	mov	rax, 1
 	jmp	Exit
 
-
+Copy_next:
+	push	rax			; Save rax
+	mov	rax, [one+40]
+	mov	[fib_num+40], rax
+	mov	rax, [one+32]
+	mov	[fib_num+32], rax
+	mov	rax, [one+24]
+	mov	[fib_num+24], rax
+	mov	rax, [one+16]
+	mov	[fib_num+16], rax
+	mov	rax, [one+8]
+	mov	[fib_num+8], rax
+	mov	rax, [one]
+	mov	[fib_num], rax
+	pop	rax			; restore rax
+	ret
 
 	section	.data
 Echo:
@@ -114,7 +129,7 @@ Ans_format:
 	db "%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
 
 fib_num:
-	dq 0xdeadbeefffffffff
+	dq 0
 	dq 0
 	dq 0
 	dq 0
@@ -141,4 +156,5 @@ two:
 tmp:		resq	1
 tmp2:		resd	1
 tmp3:		resq	1
+tmp4:		resd	1
 num:		resq	1
