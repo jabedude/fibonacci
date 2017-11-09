@@ -2,4 +2,5 @@
 *.o
 a.out
 .gdb*
+fibonacci
 x86Assessment1.pdf

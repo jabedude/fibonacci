@@ -1,12 +1,9 @@
-.PHONY: clean
+all: fibonacci
+fibonacci: fib.o
+	gcc -s -o fibonacci fib.o
 
-BINS=fibonacci
-
-DEPS1=fibonacci.s
-
-all: $(BINS)
-fibonacci: $(DEPS1)
+fib.o: fibonacci.s
+	nasm -felf64 fibonacci.s -o fib.o
 
 clean:
-	$(RM) $(DEPS1) $(BINS)
-
+	rm -f *.o fibonacci
