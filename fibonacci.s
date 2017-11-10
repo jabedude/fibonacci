@@ -16,17 +16,8 @@ main:
 	call	strtoul
 	mov	qword[input], rax
 
-	cmp	qword[input], 0		; Handle input of 0
-	je	Edge_fib
-	cmp	qword[input], 1		; Handle input of 1
-	je	Edge_fib
-
-	mov	qword[tmp], rsi		; Print the argument
-	mov	rdi, Echo
-	mov	rsi, [input]
-	xor	rax, rax
-	call	printf
-	mov	rsi, qword[tmp]
+	cmp	qword[input], 1		; Handle inputs less than 2
+	jle	Edge_fib
 
 	mov	ecx, 1			; Fibonacci loop
 Loop:
@@ -63,6 +54,8 @@ Exit:
 
 Edge_fib:
 	mov	r14, [input]
+	cmp	r14, 0			; Check if input is negative
+	jl	Fib_usage
 	mov	[fib_num], r14
 	call	Display_fib
 	jmp	Exit
@@ -81,10 +74,10 @@ Display_fib:
 	ret
 
 Fib_usage:
-	mov	rdi, Usage
+	mov	rdi, Usage		; Print error message
 	xor	rax, rax
 	call	puts
-	mov	rax, 1
+	mov	rax, 1			; Return 1
 	jmp	Exit
 
 Copy_next:
@@ -136,7 +129,7 @@ Echo:
 	db "Arg is: %d", 10, 0
 
 Usage:
-	db "./fibonacci <number>", 10, 0
+	db "./fibonacci <number 0-500>", 10, 0
 
 Ans_format:
 	db "0x%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
