@@ -1,6 +1,5 @@
 	extern	printf
 	extern	puts
-	extern	putchar
 	extern	strtoul
 	global	main			; global entry point
 
@@ -9,17 +8,22 @@ main:
 	push	r15			; Command line number check
 	mov	r15, rsi
 	cmp	edi, 2
-	jne	fib_usage
+	jne	Fib_usage
 
 	mov	rdi, [r15 + 8]		; Convert the argument
 	xor	rsi, rsi
 	mov	rdx, 10
 	call	strtoul
-	mov	qword[num], rax
+	mov	qword[input], rax
+
+	cmp	qword[input], 0		; Handle input of 0
+	je	Edge_fib
+	cmp	qword[input], 1		; Handle input of 1
+	je	Edge_fib
 
 	mov	qword[tmp], rsi		; Print the argument
 	mov	rdi, Echo
-	mov	rsi, [num]
+	mov	rsi, [input]
 	xor	rax, rax
 	call	printf
 	mov	rsi, qword[tmp]
@@ -43,14 +47,13 @@ Loop:
 	mov	dword[tmp3], ebx
 	mov	qword[tmp], rsi		; Print the fib number
 	call	Copy_next
-	;call	display_fib
 	mov	ecx, dword[tmp2]
 	mov	ebx, dword[tmp3]
 	mov	rsi, qword[tmp]
 	inc	ecx
-	cmp	ecx, [num]
+	cmp	ecx, [input]
 	jne	Loop
-	call	display_fib
+	call	Display_fib
 
 	xor	rax, rax		; Return value 0
 
@@ -58,7 +61,13 @@ Exit:
 	pop	r15
 	ret
 
-display_fib:
+Edge_fib:
+	mov	r14, [input]
+	mov	[fib_num], r14
+	call	Display_fib
+	jmp	Exit
+
+Display_fib:
 	mov	rdi, Ans_format
 	mov	rsi, [fib_num+40]
 	mov	rdx, [fib_num+32]
@@ -71,7 +80,7 @@ display_fib:
 	pop	qword [fib_num]
 	ret
 
-fib_usage:
+Fib_usage:
 	mov	rdi, Usage
 	xor	rax, rax
 	call	puts
@@ -129,9 +138,6 @@ Echo:
 Usage:
 	db "./fibonacci <number>", 10, 0
 
-Fib_format:
-	db "fib_num+40=%016llx fib_num+32=%016llx fib_num+24=%016llx fib_num+16=%016llx fib_num+8=%016llx fib_num=%016llx", 10, 0
-
 Ans_format:
 	db "0x%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
 
@@ -163,5 +169,4 @@ two:
 tmp:		resq	1
 tmp2:		resd	1
 tmp3:		resq	1
-tmp4:		resd	1
-num:		resq	1
+input:		resq	1
