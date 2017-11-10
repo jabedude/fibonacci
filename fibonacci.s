@@ -41,7 +41,7 @@ Loop:
 	mov	ebx, dword[tmp3]
 	mov	rsi, qword[tmp]
 	inc	ecx
-	cmp	ecx, [input]
+	cmp	ecx, [input]		; Check if counter equals input
 	jne	Loop
 	call	Display_fib
 
