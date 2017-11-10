@@ -1,5 +1,4 @@
 	extern	printf
-	extern	strtoul
 	global	main			; global entry point
 
 	section	.text
@@ -9,10 +8,10 @@ main:
 	cmp	edi, 2
 	jne	Fib_usage
 
-	mov	rdi, [r15 + 8]		; Convert the argument
-	xor	rsi, rsi
-	mov	rdx, 10
-	call	strtoul
+	push	rsi			; Convert input from string
+	mov	rsi, [r15+8]
+	call	Atoi
+	pop	rsi
 	mov	qword[input], rax
 
 	cmp	qword[input], 1		; Handle inputs less than 2
@@ -124,6 +123,36 @@ Copy_next:
 
 	pop	rax			; restore rax
 	ret
+
+Atoi:
+	push	rbx			; Save registers
+	push	rdx
+	push	rsi
+
+	xor	rax, rax
+
+	Nxt_char:
+		mov	rbx, 0
+		mov	bl, [rsi]
+		inc	rsi
+
+		cmp	bl, '0'
+		jb	Inval
+		cmp	bl, '9'
+		ja	Inval
+
+		sub	bl, '0'
+		mov	r14, 10
+		mul	r14
+		add	rax, rbx
+		jmp	Nxt_char
+
+	Inval:
+		pop	rsi
+		pop	rdx
+		pop	rbx
+		ret
+
 
 	section	.data
 usage_msg	db "./fibonacci <number 0-500>", 10, 0
