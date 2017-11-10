@@ -137,7 +137,7 @@ Atoi:					; x86 version of 'atoi'
 		inc	rsi
 
 		cmp	bl, '-'		; Check if char is '-'
-		je	Neg		; If so, treat as negative
+		je	Oob		; If so, treat as negative
 		cmp	bl, '0'		; Invalid numbers checks (0 <= n <= 9)
 		jb	Inval
 		cmp	bl, '9'
@@ -149,10 +149,13 @@ Atoi:					; x86 version of 'atoi'
 		add	rax, rbx
 		jmp	Nxt_char
 	
-	Neg:
-		mov	rax, -1		; Return -1 if input is negative
+	Oob:
+		mov	rax, -1		; Return -1 if input is Out of bounds  
+					; 0 <= n <= 500(Oob)
 
 	Inval:
+		cmp	rax, 500	; Check if greater than 500
+		jg	Oob
 		pop	rsi
 		pop	rdx
 		pop	rbx
