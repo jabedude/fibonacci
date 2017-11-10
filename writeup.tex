@@ -65,10 +65,10 @@ n\textsuperscript{th} Fibonacci number, where 0 $\leq$ n $\leq$	500.
 
 \begin{itemize}
 	\item[$\bullet$] The program must take one command line parameter, n.
-	\item[$\bullet$] The program should produce an error message if no parameter is 
-	passed.
-	\item[$\bullet$] The program must be able to calculate Fibonacci numbers from 0 $\leq$ 
-	n $\leq$ 500.
+	\item[$\bullet$] The program should produce an error message if no 
+	parameter is passed.
+	\item[$\bullet$] The program must be able to calculate Fibonacci numbers 
+	from 0 $\leq$ n $\leq$ 500.
 \end{itemize}
 \vspace{.5pc}
 
@@ -116,24 +116,21 @@ for (int i = 1; i < num; i++) {
             two = fib_num;
 }
 \end{lstlisting}
-
-sleeps for 5000 nanoseconds. This loop is performed until the user gives a 
-control-D to the dispatcher. In order to prevent a control-C from prematurely
-ending the dispatcher (which would result in the shared memory segment not
-being deleted), a tiny SIGINT handler is used at the beginning of the program.
-The listeners test for the existence of the shared memory segment and if it 
-does not exist, the listener exits cleanly. Once the user sends a control-D to
-the dispatcher, the dispatcher sets the shared memory to EOT which is the 
-magical number that closes the listeners. 
+Code listing 1. shows the Fibonacci algorithm the program uses to calculate 
+$f(n)$ where 2 $\leq$ n $\leq$ 500.  The program uses three 6 QWORD chunk 
+variables to calculate each successive Fibonacci number.  Using the 
+traditional rcx register to count until it reaches the user input, the program
+follows the structure of the C code in Listing 1.  Once the number is 
+calculated, the program prints the number using a call to the C function 
+\textit{printf}, then returns 0 and exits. 
 \vspace{.5pc}
 
 \begin{flushleft}
 \textbf{Communications Protocol:}
 \vspace{.5pc}
 \end{flushleft}
-
-The dispatcher and listener performed IPC via System V shared memory. This 
-communication was one-way and used exactly one byte of memory.  
+No communication occurs besides from user to program (command-line) and 
+program to user (STDOUT).
 \vspace{.5pc}
 
 \begin{flushleft}
@@ -142,12 +139,11 @@ communication was one-way and used exactly one byte of memory.
 \end{flushleft}
 
 \begin{itemize}
-	\item[$\bullet$] Listeners re-printing data in shared memory before it is 
-	deleted.
-	\item[$\bullet$] Listeners closing when user gives a control-D to the 
-	dispatcher.
-	\item[$\bullet$] Dispatcher not prematurely closing before sending EOT to
-	listeners. 
+	\item[$\bullet$] Calculating extremely large numbers (well over 100's of 
+	septendecillions)
+	\item[$\bullet$] Keeping assembly code well organized
+	\item[$\bullet$] Flow control of program without high-level constructs 
+	such as while/for loops.
 \end{itemize}
 \vspace{.5pc}
 
@@ -159,14 +155,14 @@ communication was one-way and used exactly one byte of memory.
 \textit{User Tests:}
 \begin{itemize}
 	\item[$\cdot$] Performed test specified in the project supplement manual.
-	\item[$\cdot$] Sent dispatcher a control-C in the middle of execution.
-	\item[$\cdot$] Checked system IPC mechanisms via the "ipcs" command to 
-	ensure that all shared memory is deleted after successful execution.
+	\item[$\cdot$] Gave malformed input (strings, more than one argument, 
+	negative numbers, numbers larger than 500).
+	\item[$\cdot$] Gave no input.
 \end{itemize}
 
 \textit{Test Cases:}
 \begin{itemize}
-	\item[$\cdot$] Tested SIGINT handler and shared memory deletion.
+	\item[$\cdot$] Used test.sh to automate testing.
 	\end{itemize}
 \vspace{.5pc}
 
@@ -175,18 +171,5 @@ communication was one-way and used exactly one byte of memory.
 \vspace{.5pc}
 \end{flushleft}
 
-The relay project was a learning experience for me. I learned about the
-various IPC mechanisms that UNIX provides such as message queues, semaphores,
-shared memory, etc. I decided to utilize shared memory after reading the 
-textbook and deciding that this method was best for one way, multicast 
-communication. I initially planned on using semaphores for the dispatcher to 
-keep track of all listeners, however, I decided that it added unneeded 
-complexity and simply used the EOT character to terminate the listeners. 
-Throughout the development of the project, I chose to prioritize efficiency
-and simplicity in order to produce a fast, accurate program. This is why I 
-chose to operate character by character and to only use one byte of shared
-memory. I am very happy with the outcome. The only possible change for the 
-future would be to use a faster mechanism for getting data from the shared 
-memory. 
 
 \end{document}
