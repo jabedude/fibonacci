@@ -137,8 +137,8 @@ Atoi:					; x86 version of 'atoi'
 		inc	rsi
 
 		cmp	bl, '-'		; Check if char is '-'
-		je	Neg
-		cmp	bl, '0'
+		je	Neg		; If so, treat as negative
+		cmp	bl, '0'		; Invalid numbers checks (0 <= n <= 9)
 		jb	Inval
 		cmp	bl, '9'
 		ja	Inval
