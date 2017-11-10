@@ -116,11 +116,11 @@ for (int i = 1; i < num; i++) {
             two = fib_num;
 }
 \end{lstlisting}
-Code listing 1. shows the Fibonacci algorithm the program uses to calculate 
+Code listing 1. shows the Fibonacci algorithm that the program uses to calculate 
 $f(n)$ where 2 $\leq$ n $\leq$ 500.  The program uses three six-QWORD chunk 
 variables to calculate each successive Fibonacci number.  Using the 
 traditional rcx register to count until it reaches the user input, the program
-follows the structure of the C code in Listing 1.  Once the number is 
+follows the structure of the C code in listing 1.  Once the number is 
 calculated, the program prints the number using a call to the C function 
 \textit{printf}, then returns 0 and exits. 
 \vspace{.5pc}
@@ -177,7 +177,7 @@ Fibonacci sequence hard. Having to calculate up to the 500\textsuperscript{th}
 number (an absurdly large value) made it even harder.  However, this project 
 was a resounding success.  All requirements were accomplished, with minimal
 C function calls.  The program is fast, easy to read, and well documented.  I
-learned a great deal during development, one of the most practical lessons was
+learned a great deal during development; one of the most practical lessons was
 being able to translate high-level C into assembly almost line by line.  If I 
 had more time, I would spend it on removing my call to \textit{printf} 
 entirely and use 100\% assembly.
