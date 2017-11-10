@@ -1,0 +1,192 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{color}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+\begin{document}
+
+
+\centerline{\sc \large x86 Assembly Writeup}
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Name:} Joshua Abraham
+\vspace{.5pc}
+
+\textbf{Date:} 9 November 2017
+\vspace{.5pc}
+
+\textbf{Current Module:} x86 Assembly
+\vspace{.5pc}
+
+\textbf{Project Name:} "Fibonacci"
+\vspace{.5pc}
+
+\textbf{Project Goals:}
+\vspace{.5pc}
+\end{flushleft}
+
+The relay project aims to create a program written in x86 assembly that calculates the 
+n\textsuperscript{th} Fibonacci number, where 0 $\leq$ n $\leq$	500.
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Considerations:}
+\vspace{.5pc}
+\end{flushleft}
+
+\begin{itemize}
+	\item[$\bullet$] The program must take one command line parameter, n.
+	\item[$\bullet$] The program should produce an error message if no parameter is 
+	passed.
+	\item[$\bullet$] The program must be able to calculate Fibonacci numbers from 0 $\leq$ 
+	n $\leq$ 500.
+\end{itemize}
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Initial Design:}
+\vspace{.5pc}
+\end{flushleft}
+
+The project is composed of the following files:
+\begin{itemize}
+	\item [$\cdot$] \textit{Makefile}: The main makefile for the project.
+	\item [$\cdot$] \textit{fibonacci.s}: The source code for fibonacci.
+	\item [$\cdot$] \textit{test.sh}: The test runner for the project.
+\end{itemize}
+\vspace{2mm}
+
+\begin{flushleft}
+\textbf{Data Flow:}
+\vspace{.5pc}
+\end{flushleft}
+
+My fibonacci program begins execution by performing command-line argument 
+checks and string to integer conversion.  The first check is on the number of 
+arguments.  The second check occurs during the string conversion routine.  If 
+the user input begins with a '-', the program exits and prints a usage 
+statement.  Next, it finishes converting the input into an integer. The 
+program then enters the Fibonacci algorithm shown in Figure 1:
+\begin{equation}
+    f(n) = \begin{cases}
+               0               & n = 0\\
+               1               & n = 1\\
+               f(n-1) + f(n-2) & \text{otherwise}
+           \end{cases}
+\end{equation}
+If the input is zero or one, the program handles these "Edge cases" in
+Edge\_fib and exits cleanly.  Otherwise the program continues into a loop 
+where it uses three six-QWORD chunk numbers to calculate a desired Fibonacci
+number.
+
+\begin{lstlisting}[language=C, caption=Fibonacci in C]
+long num, one = 0, two = 1, fib_num;
+for (int i = 1; i < num; i++) {
+            fib_num = one + two;
+            one = two;
+            two = fib_num;
+}
+\end{lstlisting}
+
+sleeps for 5000 nanoseconds. This loop is performed until the user gives a 
+control-D to the dispatcher. In order to prevent a control-C from prematurely
+ending the dispatcher (which would result in the shared memory segment not
+being deleted), a tiny SIGINT handler is used at the beginning of the program.
+The listeners test for the existence of the shared memory segment and if it 
+does not exist, the listener exits cleanly. Once the user sends a control-D to
+the dispatcher, the dispatcher sets the shared memory to EOT which is the 
+magical number that closes the listeners. 
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Communications Protocol:}
+\vspace{.5pc}
+\end{flushleft}
+
+The dispatcher and listener performed IPC via System V shared memory. This 
+communication was one-way and used exactly one byte of memory.  
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Potential Pitfalls:}
+\vspace{.5pc}
+\end{flushleft}
+
+\begin{itemize}
+	\item[$\bullet$] Listeners re-printing data in shared memory before it is 
+	deleted.
+	\item[$\bullet$] Listeners closing when user gives a control-D to the 
+	dispatcher.
+	\item[$\bullet$] Dispatcher not prematurely closing before sending EOT to
+	listeners. 
+\end{itemize}
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Test Plan:}
+\vspace{.5pc}
+\end{flushleft}
+
+\textit{User Tests:}
+\begin{itemize}
+	\item[$\cdot$] Performed test specified in the project supplement manual.
+	\item[$\cdot$] Sent dispatcher a control-C in the middle of execution.
+	\item[$\cdot$] Checked system IPC mechanisms via the "ipcs" command to 
+	ensure that all shared memory is deleted after successful execution.
+\end{itemize}
+
+\textit{Test Cases:}
+\begin{itemize}
+	\item[$\cdot$] Tested SIGINT handler and shared memory deletion.
+	\end{itemize}
+\vspace{.5pc}
+
+\begin{flushleft}
+\textbf{Conclusion:}
+\vspace{.5pc}
+\end{flushleft}
+
+The relay project was a learning experience for me. I learned about the
+various IPC mechanisms that UNIX provides such as message queues, semaphores,
+shared memory, etc. I decided to utilize shared memory after reading the 
+textbook and deciding that this method was best for one way, multicast 
+communication. I initially planned on using semaphores for the dispatcher to 
+keep track of all listeners, however, I decided that it added unneeded 
+complexity and simply used the EOT character to terminate the listeners. 
+Throughout the development of the project, I chose to prioritize efficiency
+and simplicity in order to produce a fast, accurate program. This is why I 
+chose to operate character by character and to only use one byte of shared
+memory. I am very happy with the outcome. The only possible change for the 
+future would be to use a faster mechanism for getting data from the shared 
+memory. 
+
+\end{document}
