@@ -59,7 +59,7 @@ Edge_fib:
 	jmp	Exit
 
 Display_fib:
-	mov	rdi, ans_format
+	mov	rdi, ans_format		; Print fib_num after calculation
 	mov	rsi, [fib_num+40]
 	mov	rdx, [fib_num+32]
 	mov	rcx, [fib_num+24]
