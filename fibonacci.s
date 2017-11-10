@@ -1,5 +1,4 @@
 	extern	printf
-	extern	puts
 	extern	strtoul
 	global	main			; global entry point
 
@@ -61,7 +60,7 @@ Edge_fib:
 	jmp	Exit
 
 Display_fib:
-	mov	rdi, Ans_format
+	mov	rdi, ans_format
 	mov	rsi, [fib_num+40]
 	mov	rdx, [fib_num+32]
 	mov	rcx, [fib_num+24]
@@ -74,9 +73,11 @@ Display_fib:
 	ret
 
 Fib_usage:
-	mov	rdi, Usage		; Print error message
-	xor	rax, rax
-	call	puts
+	mov	rdx, usage_len		; Set up for the system call
+	mov	rcx, usage_msg
+	mov	rbx, 1
+	mov	rax, 4			; sys_write sys call
+	int	0x80
 	mov	rax, 1			; Return 1
 	jmp	Exit
 
@@ -125,38 +126,17 @@ Copy_next:
 	ret
 
 	section	.data
-Echo:
-	db "Arg is: %d", 10, 0
+usage_msg	db "./fibonacci <number 0-500>", 10, 0
 
-Usage:
-	db "./fibonacci <number 0-500>", 10, 0
+usage_len	equ $ - usage_msg
 
-Ans_format:
-	db "0x%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
+ans_format	db "0x%016llx%016llx%016llx%016llx%016llx%016llx", 10, 0
 
-fib_num:
-	dq 0
-	dq 0
-	dq 0
-	dq 0
-	dq 0
-	dq 0
+fib_num		dq 0,0,0,0,0,0
 
-one:
-	dq 0
-	dq 0
-	dq 0
-	dq 0
-	dq 0
-	dq 0
+one		dq 0,0,0,0,0,0
 	
-two:
-	dq 1
-	dq 0
-	dq 0
-	dq 0
-	dq 0
-	dq 0
+two		dq 1,0,0,0,0,0
 
 	section .bss
 tmp:		resq	1
