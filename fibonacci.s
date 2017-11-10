@@ -34,8 +34,8 @@ Loop:
 
 	mov	dword[tmp2], ecx
 	mov	dword[tmp3], ebx
-	mov	qword[tmp], rsi		; Print the fib number
-	call	Copy_next
+	mov	qword[tmp], rsi
+	call	Copy_next               ; Move values from second to next
 	mov	ecx, dword[tmp2]
 	mov	ebx, dword[tmp3]
 	mov	rsi, qword[tmp]
