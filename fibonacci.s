@@ -124,7 +124,7 @@ Copy_next:
 	pop	rax			; restore rax
 	ret
 
-Atoi:
+Atoi:					; x86 version of 'atoi'
 	push	rbx			; Save registers
 	push	rdx
 	push	rsi
@@ -136,6 +136,8 @@ Atoi:
 		mov	bl, [rsi]
 		inc	rsi
 
+		cmp	bl, '-'		; Check if char is '-'
+		je	Neg
 		cmp	bl, '0'
 		jb	Inval
 		cmp	bl, '9'
@@ -146,6 +148,9 @@ Atoi:
 		mul	r14
 		add	rax, rbx
 		jmp	Nxt_char
+	
+	Neg:
+		mov	rax, -1		; Return -1 if input is negative
 
 	Inval:
 		pop	rsi
